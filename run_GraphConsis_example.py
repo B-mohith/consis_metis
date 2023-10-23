@@ -133,6 +133,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
+    '''
     combined_adj_list = {}
     for node, neighbors in item_adj_lists.items():
         
@@ -145,9 +146,10 @@ def main():
         if node not in combined_adj_list:
             combined_adj_list[node] = []
         combined_adj_list[node].extend(neighbors)
+        '''
     
     
-    social_subgraphs = partition_graph(combined_adj_list, 4)
+    social_subgraphs = partition_graph(trainset, 4)
     '''
     item_subgraphs = partition_graph(item_adj_lists, num_partitions)
     ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
