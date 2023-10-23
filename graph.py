@@ -107,6 +107,8 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
         # Unpack the data in the correct format
       batch_nodes_u, *batch_nodes_v = data
       labels_list = None
+      batch_nodes_u = torch.LongTensor(batch_nodes_u).to(device)
+      batch_nodes_v = torch.LongTensor(batch_nodes_v).to(device)
 
       optimizer.zero_grad()
       loss = model.loss(batch_nodes_u.to(device), batch_nodes_v.to(device), labels_list.to(device))
