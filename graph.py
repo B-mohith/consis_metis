@@ -102,11 +102,13 @@ def create_data_loader(subgraph, batch_size):
 def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
     running_loss = 0.0
+    labels_list = torch.tensor([]).to(device)
+  
     for i, data in enumerate(social_loader, 0):
-      print(data)
+      #print(data)
         # Unpack the data in the correct format
       batch_nodes_u, *batch_nodes_v = data
-      labels_list = None
+      #labels_list = None
       batch_nodes_u = torch.LongTensor(batch_nodes_u).to(device)
       batch_nodes_v = torch.LongTensor(batch_nodes_v).to(device)
 
