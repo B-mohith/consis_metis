@@ -25,10 +25,10 @@ import metis
 
 def partition_graph(adj_list, num_partitions):
     # Convert the adjacency list to a Metis graph object
-    metis_graph = metis.adjlist_to_metis(adj_list)
+    #metis_graph = metis.adjlist_to_metis(adj_list)
 
     # Partition the graph using Metis
-    edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
+    edgecuts, parts = metis.part_graph(adj_list, nparts=num_partitions)
 
     # Split the graph into subgraphs based on the partitions
     subgraphs = [{} for _ in range(num_partitions)]
@@ -134,7 +134,7 @@ def main():
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
     
-    social_subgraphs = partition_graph(social_adj_lists, num_partitions)
+    social_subgraphs = partition_graph(social_adj_lists, 4)
     '''
     item_subgraphs = partition_graph(item_adj_lists, num_partitions)
     ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
