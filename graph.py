@@ -37,6 +37,46 @@ def partition_graph(adj_list, num_partitions):
 
     return subgraphs
 
+import networkx as nx
+
+def construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists):
+  """Constructs a social recommendation graph from the given data.
+
+  Args:
+    history_u_lists: A list of user interaction histories, where each item in the list is a list of item IDs that the user has interacted with.
+    history_ur_lists: A list of user-rating histories, where each item in the list is a list of ratings that the user has given to the items in their interaction history.
+    history_v_lists: A list of item interaction histories, where each item in the list is a list of user IDs that have interacted with the item.
+    history_vr_lists: A list of item-rating histories, where each item in the list is a list of ratings that the users in the interaction history have given to the item.
+    social_adj_lists: A list of social adjacency lists, where each item in the list is a list of user IDs that are connected to the user.
+    item_adj_lists: A list of item adjacency lists, where each item in the list is a list of item IDs that are connected to the item.
+
+  Returns:
+    A NetworkX graph representing the social recommendation graph.
+  """
+
+  graph = nx.Graph()
+
+  # Add the users and the items to the graph.
+  for user_id in range(len(history_u_lists)):
+    graph.add_node(user_id, type="user")
+  for item_id in range(len(history_v_lists)):
+    graph.add_node(item_id, type="item")
+
+  # Add the edges to the graph.
+  for user_id in range(len(history_u_lists)):
+    for item_id in history_u_lists[user_id]:
+      graph.add_edge(user_id, item_id, type="interaction")
+    for other_user_id in social_adj_lists[user_id]:
+      graph.add_edge(user_id, other_user_id, type="social")
+
+  for item_id in range(len(history_v_lists)):
+    for user_id in history_v_lists[item_id]:
+      graph.add_edge(user_id, item_id, type="interaction")
+    for other_item_id in item_adj_lists[item_id]:
+      graph.add_edge(item_id, other_item_id, type="item")
+
+  return graph
+
 
 def create_data_loader(data, batch_size):
     # Create data loaders using your data structure
@@ -148,8 +188,8 @@ def main():
         combined_adj_list[node].extend(neighbors)
         '''
     
-    
-    social_subgraphs = partition_graph(trainset, 4)
+    graph_input = construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists)
+    social_subgraphs = partition_graph(graph_input, 4)
     '''
     item_subgraphs = partition_graph(item_adj_lists, num_partitions)
     ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
