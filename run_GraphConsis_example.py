@@ -25,10 +25,10 @@ import metis
 
 def partition_graph(adj_list, num_partitions):
     # Convert the adjacency list to a Metis graph object
-    #metis_graph = metis.adjlist_to_metis(adj_list)
+    metis_graph = metis.adjlist_to_metis(adj_list)
 
     # Partition the graph using Metis
-    edgecuts, parts = metis.part_graph(adj_list, nparts=num_partitions)
+    edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
 
     # Split the graph into subgraphs based on the partitions
     subgraphs = [{} for _ in range(num_partitions)]
