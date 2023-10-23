@@ -40,12 +40,19 @@ def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     return 0
 
 def partition_graph(graph, num_partitions):
-    # Use Metis to partition the graph into num_partitions
-    (edgecuts, parts) = metis.part_graph(graph, nparts=num_partitions)
+    adj_list = [[] for _ in range(len(graph))]
+    
+    for node, neighbors in enumerate(graph):
+        adj_list[node] = [int(neighbor) for neighbor in neighbors]
+    
+    (edgecuts, parts) = metis.part_graph(adj_list, nparts=num_partitions)
     subgraphs = [defaultdict(list) for _ in range(num_partitions)]
+    
     for node, part in enumerate(parts):
         subgraphs[part][node] = graph[node]
+    
     return subgraphs
+
 
 def main():
     # Training settings
