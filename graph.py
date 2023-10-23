@@ -81,29 +81,41 @@ def create_data_loader(data, batch_size):
     loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
     return loader
     '''
-def create_data_loader(graph, batch_size):
-  """Creates a data loader for the given graph.
+import torch
 
-  Args:
-    graph: A networkx graph.
-    batch_size: The batch size.
+def create_data_loader(subgraph, batch_size):
+    """
+    Create a data loader for a subgraph.
 
-  Returns:
-    A PyTorch data loader.
-  """
+    Args:
+        subgraph (networkx.Graph): The subgraph for which the data loader is created.
+        batch_size (int): The batch size for the data loader.
 
-  # Get the node IDs in the graph.
-  node_ids = list(graph.nodes())
+    Returns:
+        torch.utils.data.DataLoader: A data loader for the subgraph.
+    """
+    edges = list(subgraph.edges())
+    num_edges = len(edges)
+    num_batches = num_edges // batch_size + 1
 
-  # Create a PyTorch dataset from the node IDs.
-  dataset = torch.utils.data.Dataset()
-  for node_id in node_ids:
-    dataset.append(node_id)
+    # Create data for the data loader
+    data = [(edges[i:i+batch_size]) for i in range(0, num_edges, batch_size)]
 
-  # Create a PyTorch data loader from the dataset.
-  data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # Define a custom DataLoader for the subgraph
+    class SubgraphDataLoader(torch.utils.data.Dataset):
+        def __init__(self, data):
+            self.data = data
 
-  return data_loader
+        def __len__(self):
+            return len(self.data)
+
+        def __getitem__(self, idx):
+            return self.data[idx]
+
+    subgraph_loader = torch.utils.data.DataLoader(SubgraphDataLoader(data), batch_size=1, shuffle=True)
+
+    return subgraph_loader
+
     
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
