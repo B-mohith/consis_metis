@@ -38,6 +38,15 @@ def partition_graph(adj_list, num_partitions):
         subgraphs[part][node] = adj_list[node]
 
     return subgraphs
+
+
+def create_data_loader(data, batch_size):
+    # Create data loaders using your data structure
+    # Modify this function based on your data format
+    # Example:
+    dataset = torch.utils.data.TensorDataset(torch.LongTensor(data['u']), torch.LongTensor(data['v']), torch.FloatTensor(data['r']))
+    loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    return loader
     
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
@@ -88,6 +97,7 @@ def main():
     parser.add_argument('--data', type = str, default='ciao')
     parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight_decay')
     args = parser.parse_args()
+    num_partitions = 4
 
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     device = torch.device(args.device)
@@ -99,7 +109,7 @@ def main():
 
     history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, traindata, validdata, testdata, social_adj_lists, item_adj_lists, ratings_list = pickle.load(
         data_file)
-
+    '''
     traindata = np.array(traindata)
     validdata = np.array(validdata)
     testdata = np.array(testdata)
@@ -125,6 +135,25 @@ def main():
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
+    '''
+    social_subgraphs = partition_graph(social_adj_lists, num_partitions)
+    item_subgraphs = partition_graph(item_adj_lists, num_partitions)
+    ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
+
+    for i in range(num_partitions):
+        social_subgraph = social_subgraphs[i]
+        item_subgraph = item_subgraphs[i]
+
+        # Create data loaders for the current subgraph
+        social_loader = create_data_loader(social_subgraph, args.batch_size)
+        item_loader = create_data_loader(item_subgraph, args.batch_size)
+        '''
+
+        # Modify your training code to work with the current subgraph
+        train(graphconsis, device, social_loader, optimizer, epoch, best_rmse, best_mae)
+        train(graphconsis, device, item_loader, optimizer, epoch, best_rmse, best_mae)
+        '''
+        
     num_users = history_u_lists.__len__()
     num_items = history_v_lists.__len__()
     num_ratings = ratings_list.__len__()
