@@ -19,6 +19,7 @@ import argparse
 import os
 import sys
 from GraphConsis import GraphConsis
+import metis
 
 
 
