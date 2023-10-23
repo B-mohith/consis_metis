@@ -30,42 +30,28 @@ class Node_Encoder(nn.Module):
 
 
     def forward(self, nodes, nodes_target, uv):
-        
         tmp_history_uv = []
         tmp_history_r = []
         tmp_adj = []
-        
         for i in range(len(nodes)):
-            try:
-                
-                if uv == True:
-                    
-                    tmp_history_uv.append(self.history_v_lists[int(nodes[i])])
-                    tmp_history_r.append(self.history_vr_lists[int(nodes[i])])
-                    tmp_adj.append(list(self.item_adj_lists[int(nodes[i])]))
-                    self_feats = self.v2e.weight[nodes]
-                    target_feats = self.u2e.weight[nodes_target]
-                
-                else:
-                    
-                    tmp_history_uv.append(self.history_u_lists[int(nodes[i])])
-                    tmp_history_r.append(self.history_ur_lists[int(nodes[i])])
-                    tmp_adj.append(list(self.social_adj_lists[int(nodes[i])]))
-                    self_feats = self.u2e.weight[nodes]
-                    target_feats = self.v2e.weight[nodes_target]
-                
-            except KeyError:
-                
-                # Handle the error gracefully, e.g. by logging it or returning a default value.
-                pass
-        
+            if uv == True:
+                tmp_history_uv.append(self.history_v_lists[int(nodes[i])])
+                tmp_history_r.append(self.history_vr_lists[int(nodes[i])])
+                tmp_adj.append(list(self.item_adj_lists[int(nodes[i])]))
+                self_feats = self.v2e.weight[nodes]
+                target_feats = self.u2e.weight[nodes_target]
+            else :
+                tmp_history_uv.append(self.history_u_lists[int(nodes[i])])
+                tmp_history_r.append(self.history_ur_lists[int(nodes[i])])
+                tmp_adj.append(list(self.social_adj_lists[int(nodes[i])]))
+                self_feats = self.u2e.weight[nodes]
+                target_feats = self.v2e.weight[nodes_target]
         neigh_feats = self.aggregator.forward(self_feats, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, self.p)
         combined = torch.cat((self_feats, neigh_feats), dim = -1)
         combined = F.relu(self.linear1(combined))
 
-  # neigh_feats = self.aggregator.forward(combined, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, 0.3)
-  # combined = torch.cat((combined, neigh_feats), dim = -1)
-  # combined = F.relu(self.linear2(combined))
+        # neigh_feats = self.aggregator.forward(combined, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, 0.3)
+        # combined = torch.cat((combined, neigh_feats), dim = -1)
+        # combined = F.relu(self.linear2(combined))
 
         return combined
-
