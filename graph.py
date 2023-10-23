@@ -105,7 +105,7 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
     for i, data in enumerate(social_loader, 0):
       print(data)
         # Unpack the data in the correct format
-      batch_nodes_u, batch_nodes_v = data
+      batch_nodes_u, *batch_nodes_v = data
       labels_list = None
 
       optimizer.zero_grad()
