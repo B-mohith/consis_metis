@@ -23,19 +23,41 @@ import metis
 
 
 
-def partition_graph(adj_list, num_partitions):
-    # Convert the adjacency list to a Metis graph object
-    metis_graph = metis.adjlist_to_metis(adj_list)
+import networkx as nx
+import metis
 
-    # Partition the graph using Metis
-    edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
+def partition_graph(graph, num_partitions):
+  """Partitions a NetworkX graph using Metis.
 
-    # Split the graph into subgraphs based on the partitions
-    subgraphs = [{} for _ in range(num_partitions)]
-    for node, part in enumerate(parts):
-        subgraphs[part][node] = adj_list[node]
+  Args:
+    graph: A NetworkX graph.
+    num_partitions: The number of partitions to partition the graph into.
 
-    return subgraphs
+  Returns:
+    A list of subgraphs, where each subgraph is a NetworkX graph.
+  """
+
+  # Convert the NetworkX graph to a Metis graph object.
+  metis_graph = metis.networkx_to_metis(graph)
+
+  # Partition the graph using Metis.
+  edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
+
+  # Split the graph into subgraphs based on the partitions.
+  subgraphs = [nx.Graph() for _ in range(num_partitions)]
+  for node, part in enumerate(parts):
+    subgraphs[part].add_node(node)
+
+  for edge in graph.edges():
+    node_u, node_v = edge
+    part_u = parts[node_u]
+    part_v = parts[node_v]
+
+    if part_u == part_v:
+      subgraphs[part_u].add_edge(node_u, node_v)
+
+  return subgraphs
+
 
 import networkx as nx
 
