@@ -58,14 +58,14 @@ class Node_Encoder(nn.Module):
                 
                 # Handle the error gracefully, e.g. by logging it or returning a default value.
                 pass
-
-  neigh_feats = self.aggregator.forward(self_feats, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, self.p)
-  combined = torch.cat((self_feats, neigh_feats), dim = -1)
-  combined = F.relu(self.linear1(combined))
+        d
+        neigh_feats = self.aggregator.forward(self_feats, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, self.p)
+        combined = torch.cat((self_feats, neigh_feats), dim = -1)
+        combined = F.relu(self.linear1(combined))
 
   # neigh_feats = self.aggregator.forward(combined, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, 0.3)
   # combined = torch.cat((combined, neigh_feats), dim = -1)
   # combined = F.relu(self.linear2(combined))
 
-  return combined
+        return combined
 
