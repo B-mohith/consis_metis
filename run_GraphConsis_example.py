@@ -109,7 +109,7 @@ def main():
 
     history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, traindata, validdata, testdata, social_adj_lists, item_adj_lists, ratings_list = pickle.load(
         data_file)
-    '''
+    
     traindata = np.array(traindata)
     validdata = np.array(validdata)
     testdata = np.array(testdata)
@@ -135,18 +135,20 @@ def main():
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
-    '''
+    
     social_subgraphs = partition_graph(social_adj_lists, num_partitions)
+    '''
     item_subgraphs = partition_graph(item_adj_lists, num_partitions)
     ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
+    '''
 
     for i in range(num_partitions):
         social_subgraph = social_subgraphs[i]
-        item_subgraph = item_subgraphs[i]
+        #item_subgraph = item_subgraphs[i]
 
         # Create data loaders for the current subgraph
         social_loader = create_data_loader(social_subgraph, args.batch_size)
-        item_loader = create_data_loader(item_subgraph, args.batch_size)
+        #item_loader = create_data_loader(item_subgraph, args.batch_size)
         '''
 
         # Modify your training code to work with the current subgraph
@@ -181,7 +183,7 @@ def main():
 
     for epoch in range(1, args.epochs + 1):
 
-        train(graphconsis, device, train_loader, optimizer, epoch, best_rmse, best_mae)
+        train(graphconsis, device, social_loader, optimizer, epoch, best_rmse, best_mae)
         expected_rmse, mae = test(graphconsis, device, valid_loader)
         if best_rmse > expected_rmse:
             best_rmse = expected_rmse
