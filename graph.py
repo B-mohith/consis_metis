@@ -20,24 +20,10 @@ import os
 import sys
 from GraphConsis import GraphConsis
 import metis
-
-
-
 import networkx as nx
 import metis
 
-def partition_graph(graph, num_partitions):
-  """Partitions a NetworkX graph using Metis.
-
-  Args:
-    graph: A NetworkX graph.
-    num_partitions: The number of partitions to partition the graph into.
-
-  Returns:
-    A list of subgraphs, where each subgraph is a NetworkX graph.
-  """
-
-  # Convert the NetworkX graph to a Metis graph object.
+def partition_graph(graph, num_partitions):  
   metis_graph = metis.networkx_to_metis(graph)
 
   # Partition the graph using Metis.
@@ -61,20 +47,7 @@ def partition_graph(graph, num_partitions):
 
 import networkx as nx
 
-def construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists):
-  """Constructs a social recommendation graph from the given data.
-
-  Args:
-    history_u_lists: A list of user interaction histories, where each item in the list is a list of item IDs that the user has interacted with.
-    history_ur_lists: A list of user-rating histories, where each item in the list is a list of ratings that the user has given to the items in their interaction history.
-    history_v_lists: A list of item interaction histories, where each item in the list is a list of user IDs that have interacted with the item.
-    history_vr_lists: A list of item-rating histories, where each item in the list is a list of ratings that the users in the interaction history have given to the item.
-    social_adj_lists: A list of social adjacency lists, where each item in the list is a list of user IDs that are connected to the user.
-    item_adj_lists: A list of item adjacency lists, where each item in the list is a list of item IDs that are connected to the item.
-
-  Returns:
-    A NetworkX graph representing the social recommendation graph.
-  """
+def construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists): 
 
   graph = nx.Graph()
 
@@ -99,7 +72,7 @@ def construct_social_recommendation_graph(history_u_lists, history_ur_lists, his
 
   return graph
 
-
+'''
 def create_data_loader(data, batch_size):
     # Create data loaders using your data structure
     # Modify this function based on your data format
@@ -107,6 +80,30 @@ def create_data_loader(data, batch_size):
     dataset = torch.utils.data.TensorDataset(torch.LongTensor(data['u']), torch.LongTensor(data['v']), torch.FloatTensor(data['r']))
     loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
     return loader
+    '''
+def create_data_loader(graph, batch_size):
+  """Creates a data loader for the given graph.
+
+  Args:
+    graph: A networkx graph.
+    batch_size: The batch size.
+
+  Returns:
+    A PyTorch data loader.
+  """
+
+  # Get the node IDs in the graph.
+  node_ids = list(graph.nodes())
+
+  # Create a PyTorch dataset from the node IDs.
+  dataset = torch.utils.data.Dataset()
+  for node_id in node_ids:
+    dataset.append(node_id)
+
+  # Create a PyTorch data loader from the dataset.
+  data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+  return data_loader
     
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
@@ -194,28 +191,11 @@ def main():
                                              torch.FloatTensor(test_r))
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
-    '''
-    combined_adj_list = {}
-    for node, neighbors in item_adj_lists.items():
-        
-    # Ensure the node is in the combined adjacency list
-        if node not in combined_adj_list:
-            combined_adj_list[node] = []
-        
-        combined_adj_list[node].extend(neighbors)
-    for node, neighbors in social_adj_lists.items():
-        if node not in combined_adj_list:
-            combined_adj_list[node] = []
-        combined_adj_list[node].extend(neighbors)
-        '''
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)   
     
     graph_input = construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists)
     social_subgraphs = partition_graph(graph_input, 4)
-    '''
-    item_subgraphs = partition_graph(item_adj_lists, num_partitions)
-    ratings_subgraphs = partition_graph(ratings_lists, num_partitions)
-    '''
+   
 
     for i in range(num_partitions):
         social_subgraph = social_subgraphs[i]
@@ -224,12 +204,7 @@ def main():
         # Create data loaders for the current subgraph
         social_loader = create_data_loader(social_subgraph, args.batch_size)
         #item_loader = create_data_loader(item_subgraph, args.batch_size)
-        '''
-
-        # Modify your training code to work with the current subgraph
-        train(graphconsis, device, social_loader, optimizer, epoch, best_rmse, best_mae)
-        train(graphconsis, device, item_loader, optimizer, epoch, best_rmse, best_mae)
-        '''
+        
         
     num_users = history_u_lists.__len__()
     num_items = history_v_lists.__len__()
