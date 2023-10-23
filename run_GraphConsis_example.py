@@ -20,10 +20,7 @@ import os
 import sys
 from GraphConsis import GraphConsis
 
-os.environ['METIS_DLL'] = '/usr/lib/x86_64-linux-gnu/libmetis.so'
-!apt-get install -y libmetis-dev
-!pip install metis
-import metis
+
 
 def partition_graph(adj_list, num_partitions):
     # Convert the adjacency list to a Metis graph object
