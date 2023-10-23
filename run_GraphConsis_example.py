@@ -20,6 +20,12 @@ import os
 import sys
 from GraphConsis import GraphConsis
 
+os.environ['METIS_DLL'] = '/usr/lib/x86_64-linux-gnu/libmetis.so'
+!apt-get install -y libmetis-dev
+!pip install metis
+import metis
+
+
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
     running_loss = 0.0
@@ -54,6 +60,8 @@ def test(model, device, test_loader):
     return expected_rmse, mae
 
 def main():
+    
+    
     # Training settings
     parser = argparse.ArgumentParser(description='Social Recommendation: GraphConsis model')
     parser.add_argument('--batch_size', type=int, default=128, metavar='N', help='input batch size for training')
