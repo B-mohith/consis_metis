@@ -72,28 +72,11 @@ def construct_social_recommendation_graph(history_u_lists, history_ur_lists, his
 
   return graph
 
-'''
-def create_data_loader(data, batch_size):
-    # Create data loaders using your data structure
-    # Modify this function based on your data format
-    # Example:
-    dataset = torch.utils.data.TensorDataset(torch.LongTensor(data['u']), torch.LongTensor(data['v']), torch.FloatTensor(data['r']))
-    loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    return loader
-    '''
+
 import torch
 
 def create_data_loader(subgraph, batch_size):
-    """
-    Create a data loader for a subgraph.
-
-    Args:
-        subgraph (networkx.Graph): The subgraph for which the data loader is created.
-        batch_size (int): The batch size for the data loader.
-
-    Returns:
-        torch.utils.data.DataLoader: A data loader for the subgraph.
-    """
+    
     edges = list(subgraph.edges())
     num_edges = len(edges)
     num_batches = num_edges // batch_size + 1
