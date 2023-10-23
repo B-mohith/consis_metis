@@ -103,16 +103,9 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
     running_loss = 0.0
     for i, data in enumerate(social_loader, 0):
-        print(data)
-
-        # Check the data format
-        if len(data) == 2:
-            batch_nodes_u, batch_nodes_v = data
-            labels_list = None
-        elif len(data) == 3:
-            batch_nodes_u, batch_nodes_v, labels_list = data
-        else:
-            raise ValueError('Unexpected data format.')
+        # Unpack the data in the correct format
+        batch_nodes_u, batch_nodes_v = data
+        labels_list = None
 
         optimizer.zero_grad()
         loss = model.loss(batch_nodes_u.to(device), batch_nodes_v.to(device), labels_list.to(device))
@@ -125,6 +118,7 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
                 epoch, i, running_loss / 100, best_rmse, best_mae))
             running_loss = 0.0
     return 0
+
 
 '''    
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
