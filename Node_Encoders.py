@@ -47,7 +47,7 @@ class Node_Encoder(nn.Module):
                     target_feats = self.u2e.weight[nodes_target]
                 
                 else:
-                    s
+                    
                     tmp_history_uv.append(self.history_u_lists[int(nodes[i])])
                     tmp_history_r.append(self.history_ur_lists[int(nodes[i])])
                     tmp_adj.append(list(self.social_adj_lists[int(nodes[i])]))
@@ -58,7 +58,7 @@ class Node_Encoder(nn.Module):
                 
                 # Handle the error gracefully, e.g. by logging it or returning a default value.
                 pass
-        d
+        
         neigh_feats = self.aggregator.forward(self_feats, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, self.p)
         combined = torch.cat((self_feats, neigh_feats), dim = -1)
         combined = F.relu(self.linear1(combined))
