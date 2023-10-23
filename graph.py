@@ -104,7 +104,7 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
     running_loss = 0.0
     for i, data in enumerate(social_loader, 0):
         # Unpack the data in the correct format
-        batch_nodes_u, batch_nodes_v = data
+        batch_nodes_u, *batch_nodes_v = data
         labels_list = None
 
         optimizer.zero_grad()
@@ -118,6 +118,7 @@ def train(model, device, social_loader, optimizer, epoch, best_rmse, best_mae):
                 epoch, i, running_loss / 100, best_rmse, best_mae))
             running_loss = 0.0
     return 0
+
 
 
 '''    
