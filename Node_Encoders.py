@@ -54,9 +54,10 @@ class Node_Encoder(nn.Module):
                     self_feats = self.u2e.weight[nodes]
                     target_feats = self.v2e.weight[nodes_target]
                 
-                except KeyError:
-                    # Handle the error gracefully, e.g. by logging it or returning a default value.
-                    pass
+            except KeyError:
+                
+                # Handle the error gracefully, e.g. by logging it or returning a default value.
+                pass
 
   neigh_feats = self.aggregator.forward(self_feats, target_feats, tmp_history_uv, tmp_history_r, tmp_adj, uv, self.p)
   combined = torch.cat((self_feats, neigh_feats), dim = -1)
