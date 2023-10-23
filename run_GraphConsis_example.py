@@ -134,14 +134,14 @@ def main():
     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
     combined_adj_list = {}
-    for node, neighbors in item_adj_list.items():
+    for node, neighbors in item_adj_lists.items():
         
     # Ensure the node is in the combined adjacency list
         if node not in combined_adj_list:
             combined_adj_list[node] = []
         
         combined_adj_list[node].extend(neighbors)
-    for node, neighbors in social_adj_list.items():
+    for node, neighbors in social_adj_lists.items():
         if node not in combined_adj_list:
             combined_adj_list[node] = []
         combined_adj_list[node].extend(neighbors)
