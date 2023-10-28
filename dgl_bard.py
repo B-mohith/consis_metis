@@ -77,6 +77,7 @@ def test(model, device, test_loader):
 
 def main():
     # Training settings
+    num_parts = 10
     parser = argparse.ArgumentParser(description='Social Recommendation: GraphConsis model')
     parser.add_argument('--batch_size', type=int, default=128, metavar='N', help='input batch size for training')
     parser.add_argument('--percent', type=float, default=0.4, help='neighbor percent')
