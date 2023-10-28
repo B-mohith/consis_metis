@@ -25,7 +25,17 @@ import dgl
 def metis_partition(graph, num_partitions):
     # Convert DGL graph to NetworkX for partitioning
     import networkx as nx
-    g_nx = graph.to_networkx(node_attrs=None, edge_attrs=None)
+    import dgl
+    import networkx as nx
+
+# Assuming social_adj_lists is a dictionary of adjacency lists
+# Convert the adjacency lists to a DGL graph
+    social_graph = dgl.DGLGraph(social_adj_lists)
+
+# Now you can use the to_networkx method on social_graph
+    g_nx = social_graph.to_networkx(node_attrs=None, edge_attrs=None)
+
+    #g_nx = graph.to_networkx(node_attrs=None, edge_attrs=None)
 
     # Perform Metis graph partitioning
     _, parts = partition.part_graph(g_nx, num_partitions, recursive=True)
