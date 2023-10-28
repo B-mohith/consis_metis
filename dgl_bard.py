@@ -22,25 +22,20 @@ from GraphConsis import GraphConsis
 import dgl
 
 
-def metis_partition(graph, num_parts):
-    """
-    Partition the graph using DGL Metis partitioning.
+def metis_partition(graph, num_partitions):
+    # Convert DGL graph to NetworkX for partitioning
+    import networkx as nx
+    g_nx = graph.to_networkx(node_attrs=None, edge_attrs=None)
 
-    Args:
-        graph: The DGL graph to be partitioned.
-        num_parts: The number of partitions to split the graph into.
+    # Perform Metis graph partitioning
+    _, parts = partition.part_graph(g_nx, num_partitions, recursive=True)
+    
+    # Create a mapping from node IDs to partition IDs
+    node_to_partition = {}
+    for node_id, partition_id in enumerate(parts):
+        node_to_partition[node_id] = partition_id
 
-    Returns:
-        A list of integers, where each integer represents the partition ID of the corresponding node in the graph.
-    """
-
-    # Create a node partitioner.
-    node_partitioner = dgl.contrib.partition.metis_partitioner(graph, num_parts)
-
-    # Partition the graph.
-    partition_ids = node_partitioner.partition()
-
-    return partition_ids
+    return node_to_partition
 
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
