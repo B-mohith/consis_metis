@@ -220,6 +220,8 @@ def main():
     # The rest of your training and testing code should remain the same
 
   # model
+  node_agg = Node_Aggregator(v2e, r2e, u2e, embed_dim, r2e.num_embeddings - 1, cuda=device)
+  node_enc = Node_Encoder(u2e, v2e, embed_dim, history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists, node_agg, percent=args.percent, cuda=device)
   graphconsis = GraphConsis(node_enc, r2e).to(device)
   optimizer = torch.optim.Adam(graphconsis.parameters(), lr=args.lr, weight_decay = args.weight_decay)
 
