@@ -21,7 +21,7 @@ import sys
 from GraphConsis import GraphConsis
 
 
-def partition_graph(adj_list, num_partitions):  
+def partition_graph(graph, num_partitions):  
  metis_graph = metis.networkx_to_metis(graph)
 
  # Partition the graph using Metis.
@@ -101,12 +101,17 @@ def main():
 
     history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, traindata, validdata, testdata, social_adj_lists, item_adj_lists, ratings_list = pickle.load(
         data_file)
-    adjacency_list = {}
-    for user, items in history_u_lists.items():
-        adjacency_list[user] = []
-        for item in items:
-            adjacency_list[user].append(item)            
-    subgraphs = partition_graph(adjacency_list, num_partitions): 
+    G = nx.Graph()
+    for user in history_u_lists:
+     G.add_node(user)
+     for user, items in history_u_lists.items():
+       for item in items:
+         G.add_edge(user, item)
+
+ 
+    
+            
+    subgraphs = partition_graph(G, 4): 
     traindata = np.array(traindata)
     validdata = np.array(validdata)
     testdata = np.array(testdata)
@@ -158,6 +163,7 @@ def main():
     endure_count = 0
 
     for epoch in range(1, args.epochs + 1):
+     
 
         train(graphconsis, device, train_loader, optimizer, epoch, best_rmse, best_mae)
         expected_rmse, mae = test(graphconsis, device, valid_loader)
