@@ -203,10 +203,15 @@ def main():
   num_users = 0
   num_items = 0
   num_ratings = 0
+  social_graph = nx.Graph()
 
   for subgraph in social_subgraphs:
       num_users += len(subgraph.nodes)
       num_items += len(subgraph.nodes)
+      subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraph.nodes()]
+      subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraph.nodes()]
+      subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraph.nodes()}
+      
 
       for edge in subgraph.edges:
          num_ratings += 1
@@ -214,11 +219,6 @@ def main():
   u2e = nn.Embedding(num_users, embed_dim).to(device)
   v2e = nn.Embedding(num_items, embed_dim).to(device)
   r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)
-    
-  subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraphs.nodes()]
-  subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraphs.nodes()]
-  subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraphs.nodes()}
-  subgraph_item_adj_lists = item_adj_lists  # Assuming item_adj_lists is not partitioned
 
     # Create a Node_Encoder instance for the subgraph with partitioned data
   node_agg = Node_Aggregator(v2e, r2e, u2e, embed_dim, r2e.num_embeddings - 1, cuda=device)
