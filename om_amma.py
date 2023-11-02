@@ -208,9 +208,9 @@ def main():
   for subgraph in social_subgraphs:
       num_users += len(subgraph.nodes)
       num_items += len(subgraph.nodes)
-      subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraph.nodes()]
-      subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraph.nodes()]
-      subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraph.nodes()}
+      subgraph_history_u_lists = [history_u_lists[u] for u in subgraph.nodes()]
+      subgraph_history_ur_lists = [history_ur_lists[u] for u in subgraph.nodes()]
+      subgraph_social_adj_lists = {u: social_adj_lists[u] for u in subgraph.nodes()}
       
 
       for edge in subgraph.edges:
