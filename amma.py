@@ -210,7 +210,7 @@ def main():
          if user_id in subgraph_nodes and item_id in subgraph_nodes:
              subgraph_ratings.append((user_id, item_id, rating_value))
 
-     partitioned_ratings_lists.append(subgraph_ratings)
+  partitioned_ratings_lists.append(subgraph_ratings)
     
 
 
