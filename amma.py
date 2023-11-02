@@ -202,6 +202,22 @@ def main():
     social_subgraph = social_subgraphs[i]
     num_users = len(social_subgraph.nodes())
     num_items = len(history_v_lists)
+   for rating in ratings_list:
+        user_id, item_id, rating_value = rating  # Assuming your ratings_list contains (user, item, rating)
+        
+        # Check if the user and item are in the current subgraph
+        if user_id in subgraph_nodes and item_id in subgraph_nodes:
+            subgraph_ratings.append((user_id, item_id, rating_value))
+
+    partitioned_ratings_lists.append(subgraph_ratings)
+    
+
+
+
+
+
+
+    num_ratings = len(partitioned_ratings_lists)
 
 
     u2e = nn.Embedding(num_users, embed_dim).to(device)
