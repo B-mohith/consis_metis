@@ -215,9 +215,9 @@ def main():
   v2e = nn.Embedding(num_items, embed_dim).to(device)
   r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)
     
-  subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraph.nodes()]
-  subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraph.nodes()]
-  subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraph.nodes()}
+  subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraphs.nodes()]
+  subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraphs.nodes()]
+  subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraphs.nodes()}
   subgraph_item_adj_lists = item_adj_lists  # Assuming item_adj_lists is not partitioned
 
     # Create a Node_Encoder instance for the subgraph with partitioned data
@@ -226,7 +226,7 @@ def main():
   #item_subgraph = item_subgraphs[i]
 
     # Create data loaders for the current subgraph
-  social_loader = create_data_loader(social_subgraph, args.batch_size)
+  social_loader = create_data_loader(social_subgraphs, args.batch_size)
 
      
      
