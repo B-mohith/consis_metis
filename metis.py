@@ -20,6 +20,29 @@ import os
 import sys
 from GraphConsis import GraphConsis
 
+
+def partition_graph(adj_list, num_partitions):  
+ metis_graph = metis.networkx_to_metis(graph)
+
+ # Partition the graph using Metis.
+ edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
+
+ # Split the graph into subgraphs based on the partitions.
+ subgraphs = [nx.Graph() for _ in range(num_partitions)]
+ for node, part in enumerate(parts):
+  subgraphs[part].add_node(node)
+
+ for edge in graph.edges():
+  node_u, node_v = edge
+  part_u = parts[node_u]
+  part_v = parts[node_v]
+
+  if part_u == part_v:
+   subgraphs[part_u].add_edge(node_u, node_v)
+
+ return subgraphs
+
+
 def train(model, device, train_loader, optimizer, epoch, best_rmse, best_mae):
     model.train()
     running_loss = 0.0
@@ -78,7 +101,12 @@ def main():
 
     history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, traindata, validdata, testdata, social_adj_lists, item_adj_lists, ratings_list = pickle.load(
         data_file)
-
+    adjacency_list = {}
+    for user, items in history_u_lists.items():
+        adjacency_list[user] = []
+        for item in items:
+            adjacency_list[user].append(item)            
+    subgraphs = partition_graph(adjacency_list, num_partitions): 
     traindata = np.array(traindata)
     validdata = np.array(validdata)
     testdata = np.array(testdata)
