@@ -202,29 +202,22 @@ def main():
     social_subgraph = social_subgraphs[i]
     num_users = len(social_subgraph.nodes())
     num_items = len(history_v_lists)
-    d
+    
+    subgraph_ratings = []  # Initialize a list to collect subgraph ratings
+    
     for rating in ratings_list:
-         user_id, item_id, rating_value = rating  # Assuming your ratings_list contains (user, item, rating)
+        user_id, item_id, rating_value = rating  # Assuming your ratings_list contains (user, item, rating)
         
         # Check if the user and item are in the current subgraph
-         if user_id in subgraph_nodes and item_id in subgraph_nodes:
-             subgraph_ratings.append((user_id, item_id, rating_value))
-
-  partitioned_ratings_lists.append(subgraph_ratings)
+        if user_id in social_subgraph.nodes() and item_id in social_subgraph.nodes():
+            subgraph_ratings.append((user_id, item_id, rating_value))
     
-
-
-
-
-
-
-    num_ratings = len(partitioned_ratings_lists)
-
-
+    partitioned_ratings_lists.append(subgraph_ratings)
+    num_ratings = len(set(rating[2] for rating in subgraph_ratings))
     u2e = nn.Embedding(num_users, embed_dim).to(device)
     v2e = nn.Embedding(num_items, embed_dim).to(device)
-    r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)
-
+    r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)  # Make sure to calculate num_ratings
+    
     subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraph.nodes()]
     subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraph.nodes()]
     subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraph.nodes()}
@@ -239,7 +232,7 @@ def main():
 
     # Create data loaders for the current subgraph
     social_loader = create_data_loader(social_subgraph, args.batch_size)
-    #item_loader = create_data_loader(item_subgraph, args.batch_size)
+
      
      
  # Inside the main functione)
