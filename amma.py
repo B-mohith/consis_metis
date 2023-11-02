@@ -197,7 +197,7 @@ def main():
   graph_input = construct_social_recommendation_graph(history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists)
   social_subgraphs = partition_graph(graph_input, 4)
   
-
+  node_encoders = []
   for i in range(num_partitions):
     social_subgraph = social_subgraphs[i]
     num_users = len(social_subgraph.nodes())
@@ -207,7 +207,17 @@ def main():
     u2e = nn.Embedding(num_users, embed_dim).to(device)
     v2e = nn.Embedding(num_items, embed_dim).to(device)
     r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)
-    
+
+    subgraph_history_u_lists = [history_u_lists[u] for u in social_subgraph.nodes()]
+    subgraph_history_ur_lists = [history_ur_lists[u] for u in social_subgraph.nodes()]
+    subgraph_social_adj_lists = {u: social_adj_lists[u] for u in social_subgraph.nodes()}
+    subgraph_item_adj_lists = item_adj_lists  # Assuming item_adj_lists is not partitioned
+
+    # Create a Node_Encoder instance for the subgraph with partitioned data
+    node_agg = Node_Aggregator(v2e, r2e, u2e, embed_dim, r2e.num_embeddings - 1, cuda=device)
+    node_enc = Node_Encoder(u2e, v2e, embed_dim, subgraph_history_u_lists, subgraph_history_ur_lists, history_v_lists, history_vr_lists, subgraph_social_adj_lists, subgraph_item_adj_lists, node_agg, percent=args.percent, cuda=device)
+
+    node_encoders.append(node_enc)
     #item_subgraph = item_subgraphs[i]
 
     # Create data loaders for the current subgraph
@@ -220,8 +230,7 @@ def main():
     # The rest of your training and testing code should remain the same
 
   # model
-  node_agg = Node_Aggregator(v2e, r2e, u2e, embed_dim, r2e.num_embeddings - 1, cuda=device)
-  node_enc = Node_Encoder(u2e, v2e, embed_dim, history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, social_adj_lists, item_adj_lists, node_agg, percent=args.percent, cuda=device)
+ 
   graphconsis = GraphConsis(node_enc, r2e).to(device)
   optimizer = torch.optim.Adam(graphconsis.parameters(), lr=args.lr, weight_decay = args.weight_decay)
 
