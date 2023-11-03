@@ -72,9 +72,9 @@ def main():
 # Add labels to the nodes.
   for node, attr in G.nodes(data=True):
     if attr['type'] == 'user':
-        label = 'User ' + node
+        label = 'User ' + str(node)
     else:
-        label = 'Item ' + node
+        label = 'Item ' + str(node)
 
     nx.draw_networkx_labels(G, pos, labels={node: label}, horizontalalignment='center', verticalalignment='center')
 
