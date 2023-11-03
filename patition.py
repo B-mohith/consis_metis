@@ -64,7 +64,7 @@ def main():
 
   for v, vr_list in history_vr_lists.items():
     for r in vr_list:
-        print("4") 
+
         G.add_edge(r, v, weight=1)
 
   pos = nx.fruchterman_reingold_layout(G)
@@ -79,7 +79,7 @@ def main():
         label = 'User ' + str(node)
     else:
         label = 'Item ' + str(node)
-    print("5")
+    
     nx.draw_networkx_labels(G, pos, labels={node: label}, horizontalalignment='center', verticalalignment='center')
 
 # Set the plot title and axis labels.
