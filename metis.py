@@ -86,7 +86,7 @@ def main():
     parser.add_argument('--test_batch_size', type=int, default=1000, metavar='N', help='input batch size for testing')
     parser.add_argument('--epochs', type=int, default=100, metavar='N', help='number of epochs to train')
     parser.add_argument('--load_from_checkpoint', type=bool, default=False, help='Load from checkpoint or not')
-    parser.add_argument('--device', type=str, default='cpu', help='cpu or cuda')
+    parser.add_argument('--device', type=str, default='cuda', help='cpu or cuda')
     parser.add_argument('--data', type = str, default='ciao')
     parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight_decay')
     args = parser.parse_args()
@@ -102,19 +102,113 @@ def main():
     history_u_lists, history_ur_lists, history_v_lists, history_vr_lists, traindata, validdata, testdata, social_adj_lists, item_adj_lists, ratings_list = pickle.load(
         data_file)
     G = nx.Graph()
-    for user in history_u_lists:
+    for user, item, rating in traindata:
      G.add_node(user)
-     for user, items in history_u_lists.items():
-       for item in items:
-         G.add_edge(user, item)
-
- 
+    for user, item, rating in traindata:
+     G.add_edge(user, item)
     
             
-    subgraphs = partition_graph(G, 4): 
-    traindata = np.array(traindata)
-    validdata = np.array(validdata)
-    testdata = np.array(testdata)
+    subgraphs = partition_graph(G, 10):
+    for subgraph in subgraphs:
+     history_u_lists_partitioned = []
+     history_ur_lists_partitioned = [] 
+     history_v_lists_partitioned = []
+     history_vr_lists_partitioned = []
+     traindata_partitioned = []
+     validdata_partitioned = []
+     testdata_partitioned = []
+     social_adj_lists_partitioned = []
+     item_adj_lists_partitioned = []
+     ratings_list_partitioned = []
+     for node in subgraph.nodes():
+       history_u_lists_partitioned.append(history_u_lists[node])
+       history_ur_lists_partitioned.append(history_ur_lists[node])
+       history_v_lists_partitioned.append(history_v_lists[node])
+       history_vr_lists_partitioned.append(history_vr_lists[node])
+       social_adj_lists_partitioned.append(social_adj_lists[node])
+       item_adj_lists_partitioned.append(item_adj_lists[node])
+     for user, item, rating in traindata:
+       if user in subgraph.nodes() and item in subgraph.nodes():
+        traindata_partitioned.append((user, item, rating))
+     traindata = np.array(traindata_partitioned)   
+     validdata = np.array(validdata)
+     testdata = np.array(testdata)
+     train_u = traindata[:, 0]
+     train_v = traindata[:, 1]
+     train_r = traindata[:, 2]
+
+     valid_u = validdata[:, 0]
+     valid_v = validdata[:, 1]
+     valid_r = validdata[:, 2]
+
+     test_u = testdata[:, 0]
+     test_v = testdata[:, 1]
+     test_r = testdata[:, 2]
+     trainset = torch.utils.data.TensorDataset(torch.LongTensor(train_u), torch.LongTensor(train_v),
+                                              torch.FloatTensor(train_r))
+     validset = torch.utils.data.TensorDataset(torch.LongTensor(valid_u), torch.LongTensor(valid_v),
+                                              torch.FloatTensor(valid_r))
+     testset = torch.utils.data.TensorDataset(torch.LongTensor(test_u), torch.LongTensor(test_v),
+                                             torch.FloatTensor(test_r))
+     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
+     valid_loader = torch.utils.data.DataLoader(validset, batch_size=args.test_batch_size, shuffle=True)
+     test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
+     num_users = history_u_lists_partitioned.__len__()
+     num_items = history_v_lists_partitioned.__len__()
+     num_ratings = ratings_list.__len__()
+
+     u2e = nn.Embedding(num_users, embed_dim).to(device)
+     v2e = nn.Embedding(num_items, embed_dim).to(device)
+     r2e = nn.Embedding(num_ratings + 1, embed_dim).to(device)
+    #node_feature
+     node_agg = Node_Aggregator(v2e, r2e, u2e, embed_dim, r2e.num_embeddings - 1, cuda=device)
+     node_enc = Node_Encoder(u2e, v2e, embed_dim, history_u_lists_partitioned, history_ur_lists_partitioned,
+                            history_v_lists_partitioned, history_vr_lists_partitioned, social_adj_lists_partitioned,
+                            item_adj_lists_partitioned.append(item_adj_lists[node]), node_agg, percent=args.percent,  cuda=device)
+
+    # model
+     graphconsis = GraphConsis(node_enc, r2e).to(device)
+     optimizer = torch.optim.Adam(graphconsis.parameters(), lr=args.lr, weight_decay = args.weight_decay)
+
+    # load from checkpoint
+     if args.load_from_checkpoint == True:
+         checkpoint = torch.load('models/' + args.data + '.pt')
+         graphconsis.load_state_dict(checkpoint['model_state_dict'])
+         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+     best_rmse = 9999.0
+     best_mae = 9999.0
+     endure_count = 0
+
+     for epoch in range(1, args.epochs + 1):
+     
+
+         train(graphconsis, device, train_loader, optimizer, epoch, best_rmse, best_mae)
+         expected_rmse, mae = test(graphconsis, device, valid_loader)
+         if best_rmse > expected_rmse:
+             best_rmse = expected_rmse
+             best_mae = mae
+             endure_count = 0
+             torch.save({
+             'epoch': epoch,
+             'model_state_dict': graphconsis.state_dict(),
+             'optimizer_state_dict': optimizer.state_dict(),
+             }, 'models/' + args.data + '.pt')
+         else:
+             endure_count += 1
+         print("rmse on valid set: %.4f, mae:%.4f " % (expected_rmse, mae))
+         rmse, mae = test(graphconsis, device, test_loader)
+         print('rmse on test set: %.4f, mae:%.4f '%(rmse, mae))
+
+         if endure_count > 5:
+             break
+     print('finished')
+
+
+   # traindata = np.array(traindata)
+
+     '''validdata = np.array(validdata)
+     testdata = np.array(testdata)
 
     train_u = traindata[:, 0]
     train_v = traindata[:, 1]
@@ -185,6 +279,7 @@ def main():
         if endure_count > 5:
             break
     print('finished')
+    '''
 
 
 if __name__ == "__main__":
