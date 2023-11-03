@@ -21,6 +21,7 @@ import sys
 from GraphConsis import GraphConsis
 import metis
 import networkx as nx
+import metis
 
 
 def partition_graph(graph, num_partitions):  
