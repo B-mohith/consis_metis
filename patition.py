@@ -49,18 +49,22 @@ def main():
 
 # Add the users and items as nodes to the graph.
   for u in history_u_lists:
+    print("1")
     G.add_node(u, type='user')
 
   for v in history_v_lists:
+    print("2")
     G.add_node(v, type='item')
 
 # Add the edges to the graph.
   for u, ur_list in history_ur_lists.items():
     for i in ur_list:
+        print("3")
         G.add_edge(u, i, weight=1)
 
   for v, vr_list in history_vr_lists.items():
     for r in vr_list:
+        print("4") 
         G.add_edge(r, v, weight=1)
 
   pos = nx.fruchterman_reingold_layout(G)
@@ -75,7 +79,7 @@ def main():
         label = 'User ' + str(node)
     else:
         label = 'Item ' + str(node)
-
+    print("5")
     nx.draw_networkx_labels(G, pos, labels={node: label}, horizontalalignment='center', verticalalignment='center')
 
 # Set the plot title and axis labels.
@@ -84,6 +88,7 @@ def main():
   plt.ylabel('Items')
 
 # Show the plot.
+  print("6")
   plt.show()
 if __name__ == "__main__":
   main()
