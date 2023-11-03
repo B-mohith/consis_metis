@@ -1,5 +1,6 @@
 import pickle
 import matplotlib.pyplot as plt
+import networkx as nx
 
 # Load the pickle file
 with open("data/filmtrust.pkl", "rb") as f:
