@@ -19,6 +19,8 @@ import argparse
 import os
 import sys
 from GraphConsis import GraphConsis
+import metis
+import networkx as nx
 
 
 def partition_graph(graph, num_partitions):  
@@ -108,7 +110,7 @@ def main():
      G.add_edge(user, item)
     
             
-    subgraphs = partition_graph(G, 10):
+    subgraphs = partition_graph(G, 10)
     for subgraph in subgraphs:
      history_u_lists_partitioned = []
      history_ur_lists_partitioned = [] 
