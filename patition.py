@@ -48,29 +48,29 @@ def main():
   G = nx.Graph()
 
 # Add the users and items as nodes to the graph.
- for u in history_u_lists:
+  for u in history_u_lists:
     G.add_node(u, type='user')
 
- for v in history_v_lists:
+  for v in history_v_lists:
     G.add_node(v, type='item')
 
 # Add the edges to the graph.
- for u, ur_list in history_ur_lists.items():
+  for u, ur_list in history_ur_lists.items():
     for i in ur_list:
         G.add_edge(u, i, weight=1)
 
- for v, vr_list in history_vr_lists.items():
+  for v, vr_list in history_vr_lists.items():
     for r in vr_list:
         G.add_edge(r, v, weight=1)
 
- pos = nx.fruchterman_reingold_layout(G)
+  pos = nx.fruchterman_reingold_layout(G)
 
 # Draw the nodes and edges of the graph.
- nx.draw_networkx_nodes(G, pos, node_size=50, node_color='blue', alpha=0.5)
- nx.draw_networkx_edges(G, pos, edge_color='black', alpha=0.3)
+  nx.draw_networkx_nodes(G, pos, node_size=50, node_color='blue', alpha=0.5)
+  nx.draw_networkx_edges(G, pos, edge_color='black', alpha=0.3)
 
 # Add labels to the nodes.
- for node, attr in G.nodes(data=True):
+  for node, attr in G.nodes(data=True):
     if attr['type'] == 'user':
         label = 'User ' + node
     else:
@@ -79,9 +79,11 @@ def main():
     nx.draw_networkx_labels(G, pos, labels={node: label}, horizontalalignment='center', verticalalignment='center')
 
 # Set the plot title and axis labels.
- plt.title('Ciao Dataset Graph')
- plt.xlabel('Users')
- plt.ylabel('Items')
+  plt.title('Ciao Dataset Graph')
+  plt.xlabel('Users')
+  plt.ylabel('Items')
 
 # Show the plot.
- plt.show()
+  plt.show()
+if __name__ == "__main__":
+  main()
