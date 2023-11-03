@@ -19,9 +19,9 @@ import argparse
 import os
 import sys
 from GraphConsis import GraphConsis
-import metis
+import metispy as metis
 import networkx as nx
-import metis
+import metispy as metis
 def networkx_to_metis(graph):
     adjlist = []
     for node in graph.nodes():
