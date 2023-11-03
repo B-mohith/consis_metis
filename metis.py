@@ -22,10 +22,18 @@ from GraphConsis import GraphConsis
 import metis
 import networkx as nx
 import metis
+def networkx_to_metis(graph):
+    adjlist = []
+    for node in graph.nodes():
+        neighbors = list(graph.neighbors(node))
+        adjlist.append(neighbors)
+    
+    return adjlist
+
 
 
 def partition_graph(graph, num_partitions):  
- metis_graph = metis.networkx_to_metis(graph)
+ metis_graph = networkx_to_metis(graph)
 
  # Partition the graph using Metis.
  edgecuts, parts = metis.part_graph(metis_graph, nparts=num_partitions)
