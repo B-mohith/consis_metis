@@ -32,6 +32,6 @@ for item_id in range(len(history_v_lists)):
 
 # Plot the graph
 plt.figure(figsize=(10, 8))
-nx.draw(G, with_labels=True)
+nx.draw(graph, with_labels=True)
 plt.title("filmtrust Dataset Graph")
 plt.show()
